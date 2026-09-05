@@ -1,0 +1,7 @@
+Copyright (c) 2026 Aris Machina. All rights reserved.
+
+This repository contains proprietary software, including code vendored
+from the Aris Protos monorepo (protos-v2). It is provided for internal
+use and for import into Aris Protos deployments. No permission is
+granted to copy, modify, distribute, or sublicense it without prior
+written consent from Aris Machina.

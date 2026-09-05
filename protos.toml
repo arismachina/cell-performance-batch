@@ -1,0 +1,154 @@
+# Aris Protos wrapper declaration — see docs/WRAPPER_SPEC.md in protos-v2.
+# Importing this repo via Models Library -> GitHub picks this file up and
+# skips LLM wrapper drafting.
+schema_version = 1
+
+[model]
+name = "Cell Performance Batch"
+description = """
+Evaluates an array of cell designs and returns an array of performance \
+KPI sets — capacity, energy, energy/power density, DCIR, mass, volume, \
+N/P ratio and OCV limits — one entry per design, in input order. Wraps \
+the same equilibrium + PyBaMM SPMe pipeline as the single-design \
+cell_performance model, with per-design failure isolation so one bad \
+point never kills the sweep.
+"""
+language = "python"
+license = "Proprietary"
+
+[wrapper]
+path = "protos/wrapper.py"
+
+# ---------------------------------------------------------------------
+# Input schema. The per-design cell_parameters / simulation_parameters
+# blocks are declared as free-form objects on purpose: they are the
+# upstream CellParametersInput / SimulationParameters payloads, validated
+# by Pydantic inside the wrapper. Restating those ~100 fields here would
+# add a second copy to keep in sync with the vendored model and it would
+# drift. See docs/CELL_PERFORMANCE_MODEL.md and examples/ for their shape.
+# ---------------------------------------------------------------------
+[wrapper.input_schema]
+"$schema" = "http://json-schema.org/draft-07/schema#"
+type = "object"
+title = "Cell design batch"
+required = ["designs"]
+
+[wrapper.input_schema.properties.designs]
+type = "array"
+description = "Cell designs to evaluate. Results come back in this order."
+
+[wrapper.input_schema.properties.designs.items]
+type = "object"
+required = ["cell_parameters"]
+
+[wrapper.input_schema.properties.designs.items.properties.id]
+type = "string"
+description = "Optional identifier echoed back on the matching result."
+
+[wrapper.input_schema.properties.designs.items.properties.name]
+type = "string"
+description = "Optional human-readable label for the design."
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters]
+type = "object"
+description = "Cell design: geometry, formulation, foils, separator, electrolyte."
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters]
+type = "object"
+description = "Per-design test protocol. Overrides the batch-level one entirely."
+
+[wrapper.input_schema.properties.simulation_parameters]
+type = "object"
+description = "Test protocol shared by every design that doesn't declare its own."
+
+[wrapper.input_schema.properties.fail_fast]
+type = "boolean"
+default = false
+description = "Stop at the first failing design; the rest report status 'skipped'."
+
+[wrapper.input_schema.properties.max_workers]
+type = "integer"
+default = 1
+minimum = 1
+maximum = 4
+description = "Designs evaluated in parallel processes. >1 disables progress and fail_fast."
+
+[wrapper.input_schema.properties.result_detail]
+type = "string"
+default = "full"
+enum = ["full", "kpis", "summary"]
+description = "full = every field; kpis = drop timeseries/experiments/BOM; summary = comparison scalars only."
+
+# ---------------------------------------------------------------------
+# Output schema.
+# ---------------------------------------------------------------------
+[wrapper.output_schema]
+"$schema" = "http://json-schema.org/draft-07/schema#"
+type = "object"
+title = "Cell design batch results"
+required = ["results", "summary"]
+
+[wrapper.output_schema.properties.results]
+type = "array"
+description = "One entry per input design, positionally aligned with designs[]."
+
+[wrapper.output_schema.properties.results.items]
+type = "object"
+required = ["index", "status"]
+
+[wrapper.output_schema.properties.results.items.properties.index]
+type = "integer"
+description = "Position of this design in the input array."
+
+[wrapper.output_schema.properties.results.items.properties.id]
+type = ["string", "null"]
+
+[wrapper.output_schema.properties.results.items.properties.name]
+type = ["string", "null"]
+
+[wrapper.output_schema.properties.results.items.properties.status]
+type = "string"
+enum = ["ok", "error", "skipped"]
+
+[wrapper.output_schema.properties.results.items.properties.error]
+type = ["string", "null"]
+description = "Failure message, or the upstream model's own error field."
+
+[wrapper.output_schema.properties.results.items.properties.traceback]
+type = ["string", "null"]
+
+[wrapper.output_schema.properties.results.items.properties.runtime_s]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis]
+type = ["object", "null"]
+description = "Cell performance KPIs for this design; null when status != 'ok'."
+
+[wrapper.output_schema.properties.summary]
+type = "object"
+description = "Batch-level counts plus a flat comparison table across designs."
+
+[wrapper.output_schema.properties.summary.properties.design_count]
+type = "integer"
+
+[wrapper.output_schema.properties.summary.properties.succeeded]
+type = "integer"
+
+[wrapper.output_schema.properties.summary.properties.failed]
+type = "integer"
+
+[wrapper.output_schema.properties.summary.properties.skipped]
+type = "integer"
+
+[wrapper.output_schema.properties.summary.properties.runtime_s]
+type = "number"
+
+[wrapper.output_schema.properties.summary.properties.result_detail]
+type = "string"
+
+[wrapper.output_schema.properties.summary.properties.comparison]
+type = "array"
+description = "Key scalar KPIs per design — chartable without unpacking results[]."
+
+[wrapper.output_schema.properties.summary.properties.comparison.items]
+type = "object"

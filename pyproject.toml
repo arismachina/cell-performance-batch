@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cell-performance-batch"
+version = "0.1.0"
+description = "Array-in / array-out cell performance evaluation for Aris Protos."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Proprietary" }
+
+# Pinned to match the protos-v2 backend the model is vendored from —
+# PyBaMM's parameter-set contents move between minor versions, and a
+# batch whose KPIs disagree with Protos' built-in cell_performance model
+# is worse than useless for comparing designs.
+dependencies = [
+    "pybamm>=26.3.1,<27",
+    "numpy>=1.26,<2",
+    "scipy>=1.11,<2",
+    "pydantic>=2.9,<3",
+]
+
+[project.optional-dependencies]
+# Impedance steps in an experiment (EISStepConfig) need this; every
+# other code path works without it.
+eis = ["pybammeis>=0.1.0,<1.0.0"]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[project.scripts]
+cell-performance-batch = "cell_performance_batch.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 88
+# The vendored model is upstream's code — reformatting it here would
+# make the next re-vendor a merge conflict instead of a copy.
+extend-exclude = ["src/cell_performance_batch/cell_performance.py"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "slow: runs the real PyBaMM pipeline (seconds per design)",
+]
