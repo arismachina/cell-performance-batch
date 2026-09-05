@@ -53,6 +53,13 @@ meaning as the single-design model. See
 [`docs/CELL_PERFORMANCE_MODEL.md`](docs/CELL_PERFORMANCE_MODEL.md) for
 the field reference and `examples/two_designs.json` for a working payload.
 
+Both structs are **declared in full** in `protos.toml`, so Protos sees
+all 64 cell-design fields, all 35 simulation-protocol fields (per design
+and batch-level) and the complete KPI output struct — units, bounds,
+enums, nested material/experiment objects and all. They are generated
+from the vendored Pydantic models rather than hand-written; see
+[Schema generation](#schema-generation).
+
 **Out** (one JSON line on stdout):
 
 ```json
@@ -124,6 +131,39 @@ path-declared schema silently ships as an empty schema and the Execute
 Model UI degrades to a raw JSON textarea. This repo therefore declares
 both schemas **inline**, and `tests/test_protos_contract.py` fails if
 anyone switches them to the path form.
+
+## Schema generation
+
+`protos.toml` is ~3,200 lines because the full structs are inlined into
+it; everything below `[wrapper.input_schema]` is generated:
+
+```bash
+python scripts/generate_protos_toml.py           # rewrite protos.toml
+python scripts/generate_protos_toml.py --check   # CI-style staleness check
+```
+
+The generator reads `CellParametersInput`, `SimulationParameters` and
+`CellPerformanceKPIs` from the vendored model and applies three
+transforms on the way to TOML:
+
+- **`$ref` / `$defs` are inlined.** Nothing in the platform's
+  `protos.toml` path resolves references, so a surviving `$ref` is an
+  opaque hole in the schema. Cycles raise rather than recurse.
+- **Nulls and auto-titles are dropped.** TOML has no null (this only
+  ever hits `"default": null`), and Pydantic's titleised field names
+  mangle units — "Positive Electrode Mass Loading Mg Cm2" against a
+  description that already reads "Positive mass loading [mg/cm²]".
+- **`required` is dropped inside `kpis`.** Under `result_detail` of
+  `kpis` or `summary` those fields are genuinely absent, so requiring
+  them would make the schema lie about two of the three modes.
+
+The emitter is bespoke, so it round-trips its own output through
+`tomllib` and refuses to write anything that doesn't parse back to the
+dicts it meant to emit. `tests/test_protos_contract.py` then checks the
+committed file against a fresh render, field-for-field against the
+Pydantic models, and reproduces the platform's dry-run sample generator
+to confirm the generated schema still yields a runnable sample. Edit the
+models, re-run the generator, commit both.
 
 ### Runtime limits to design around
 

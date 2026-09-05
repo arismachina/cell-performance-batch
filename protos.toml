@@ -1,6 +1,10 @@
 # Aris Protos wrapper declaration — see docs/WRAPPER_SPEC.md in protos-v2.
 # Importing this repo via Models Library -> GitHub picks this file up and
 # skips LLM wrapper drafting.
+#
+# THE SCHEMAS BELOW ARE GENERATED. Edit the Pydantic models, then run
+#   python scripts/generate_protos_toml.py
+# `pytest tests/test_protos_contract.py` fails if this file goes stale.
 schema_version = 1
 
 [model]
@@ -19,19 +23,13 @@ license = "Proprietary"
 [wrapper]
 path = "protos/wrapper.py"
 
-# ---------------------------------------------------------------------
-# Input schema. The per-design cell_parameters / simulation_parameters
-# blocks are declared as free-form objects on purpose: they are the
-# upstream CellParametersInput / SimulationParameters payloads, validated
-# by Pydantic inside the wrapper. Restating those ~100 fields here would
-# add a second copy to keep in sync with the vendored model and it would
-# drift. See docs/CELL_PERFORMANCE_MODEL.md and examples/ for their shape.
-# ---------------------------------------------------------------------
 [wrapper.input_schema]
 "$schema" = "http://json-schema.org/draft-07/schema#"
 type = "object"
 title = "Cell design batch"
 required = ["designs"]
+
+[wrapper.input_schema.properties]
 
 [wrapper.input_schema.properties.designs]
 type = "array"
@@ -40,6 +38,8 @@ description = "Cell designs to evaluate. Results come back in this order."
 [wrapper.input_schema.properties.designs.items]
 type = "object"
 required = ["cell_parameters"]
+
+[wrapper.input_schema.properties.designs.items.properties]
 
 [wrapper.input_schema.properties.designs.items.properties.id]
 type = "string"
@@ -50,16 +50,2168 @@ type = "string"
 description = "Optional human-readable label for the design."
 
 [wrapper.input_schema.properties.designs.items.properties.cell_parameters]
+additionalProperties = false
+description = "Cell design: geometry, electrode formulation, foils, separator, electrolyte and voltage limits."
+required = ["positive_electrode_mass_loading_mg_cm2", "negative_electrode_mass_loading_mg_cm2", "positive_electrode_sheet_count", "negative_electrode_sheet_count", "jelly_roll_count", "electrode_coating_side_count", "form_factor", "positive_electrode_specific_heat_capacity_J_kg_K", "negative_electrode_specific_heat_capacity_J_kg_K", "positive_electrode_thermal_conductivity_W_m_K", "negative_electrode_thermal_conductivity_W_m_K", "positive_electrode_electronic_conductivity_S_m", "negative_electrode_electronic_conductivity_S_m", "positive_coating_thickness_um", "negative_coating_thickness_um", "positive_electrode_active_materials", "negative_electrode_active_materials", "positive_electrode_binders", "negative_electrode_binders", "positive_electrode_conductive_agents", "negative_electrode_conductive_agents", "positive_electrode_foil_thickness_um", "negative_electrode_foil_thickness_um", "positive_electrode_foil_density_g_cm3", "negative_electrode_foil_density_g_cm3", "positive_electrode_foil_electronic_conductivity_S_m", "negative_electrode_foil_electronic_conductivity_S_m", "positive_electrode_foil_specific_heat_capacity_J_kg_K", "negative_electrode_foil_specific_heat_capacity_J_kg_K", "positive_electrode_foil_thermal_conductivity_W_m_K", "negative_electrode_foil_thermal_conductivity_W_m_K", "separator_sheet_count", "separator_sheet_width_mm", "separator_sheet_height_mm", "separator_thickness_um", "separator_porosity", "separator_density_g_cm3", "separator_specific_heat_capacity_J_kg_K", "separator_thermal_conductivity_W_m_K", "electrolyte_density_g_cm3", "electrolyte_fill_ratio", "casing_thickness_mm", "casing_density_g_cm3", "electrode_overhang_mm", "jelly_roll_inner_diameter_mm", "volume_packing_ratio", "upper_voltage_cutoff_V", "lower_voltage_cutoff_V"]
 type = "object"
-description = "Cell design: geometry, formulation, foils, separator, electrolyte."
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_mass_loading_mg_cm2]
+description = "Positive mass loading [mg/cm²]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_mass_loading_mg_cm2]
+description = "Negative mass loading [mg/cm²]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_sheet_count]
+description = "Positive sheet count"
+type = "integer"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_sheet_count]
+description = "Negative sheet count"
+type = "integer"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.jelly_roll_count]
+description = "Jelly roll count"
+type = "integer"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrode_coating_side_count]
+description = "Number of coating sides for the electrode"
+type = "integer"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.form_factor]
+description = "Pouch, Prismatic, Coin or Cylindrical"
+enum = ["Pouch", "Prismatic", "Cylindrical", "Coin"]
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_width_mm]
+description = "Cell width (or diameter for cylindrical/coin) [mm]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_width_mm.anyOf]]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_width_mm.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_height_mm]
+description = "Cell height [mm]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_height_mm.anyOf]]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_height_mm.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_thickness_mm]
+description = "Cell thickness [mm]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_thickness_mm.anyOf]]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_thickness_mm.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_diameter_mm]
+description = "Cell diameter [mm]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_diameter_mm.anyOf]]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_diameter_mm.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_width_mm]
+description = "Positive electrode width [mm]. If provided, used directly for area calculation instead of deriving from cell dimensions. Also used for negative electrode if negative-specific dimensions not provided."
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_width_mm.anyOf]]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_width_mm.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_height_mm]
+description = "Positive electrode height [mm]. If provided, used directly for area calculation instead of deriving from cell dimensions. Also used for negative electrode if negative-specific dimensions not provided."
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_height_mm.anyOf]]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_height_mm.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_width_mm]
+description = "Negative electrode width [mm]. If provided, used directly for area calculation instead of deriving from cell dimensions. If not provided, positive electrode width is used."
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_width_mm.anyOf]]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_width_mm.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_height_mm]
+description = "Negative electrode height [mm]. If provided, used directly for area calculation instead of deriving from cell dimensions. If not provided, positive electrode height is used."
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_height_mm.anyOf]]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_height_mm.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_specific_heat_capacity_J_kg_K]
+description = "Positive electrode specific heat capacity [J/kg/K]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_specific_heat_capacity_J_kg_K]
+description = "Negative electrode specific heat capacity [J/kg/K]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_thermal_conductivity_W_m_K]
+description = "Positive electrode thermal conductivity [W/m/K]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_thermal_conductivity_W_m_K]
+description = "Negative electrode thermal conductivity [W/m/K]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_electronic_conductivity_S_m]
+description = "Positive electrode electronic conductivity [S/m]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_electronic_conductivity_S_m]
+description = "Negative electrode electronic conductivity [S/m]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_coating_thickness_um]
+description = "Positive electrode coating thickness [µm]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_coating_thickness_um]
+description = "Negative electrode coating thickness [µm]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials]
+description = "List of active materials in positive electrode formulation"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items]
+additionalProperties = false
+description = "Active material in electrode formulation. Optional OCV data for PyBaMM."
+required = ["name", "mass_fraction", "density_g_cm3", "specific_capacity_mAh_g", "nominal_voltage_V"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.name]
+description = "Material name, e.g. 'NMC811', 'LFP', 'Graphite'"
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.mass_fraction]
+description = "Mass fraction in electrode formulation"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.density_g_cm3]
+description = "True density [g/cm³]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.specific_capacity_mAh_g]
+description = "Reversible specific capacity [mAh/g]"
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.nominal_voltage_V]
+description = "Midpoint voltage vs Li/Li⁺ [V]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.soc_pct]
+description = "State of charge [0-100%]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.soc_pct.anyOf]]
+minItems = 2
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.soc_pct.anyOf.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.soc_pct.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.ch_ocv_V]
+description = "OCV during charge [V]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.ch_ocv_V.anyOf]]
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.ch_ocv_V.anyOf.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.ch_ocv_V.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.dch_ocv_V]
+description = "OCV during discharge [V]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.dch_ocv_V.anyOf]]
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.dch_ocv_V.anyOf.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.dch_ocv_V.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.ocv_specific_capacity_mAh_g]
+description = "Specific capacity [mAh/g] per point"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.ocv_specific_capacity_mAh_g.anyOf]]
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.ocv_specific_capacity_mAh_g.anyOf.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.ocv_specific_capacity_mAh_g.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.max_lithium_conc_mol_m3]
+description = "Max Li concentration [mol/m³]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.max_lithium_conc_mol_m3.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.max_lithium_conc_mol_m3.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.diffusivity_m2_s]
+description = "Particle diffusivity [m²/s]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf]]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf]]
+additionalProperties = false
+description = "Tabulated ionic transport property (conc, temp -> value)."
+required = ["conc_mol_m3", "temp_K", "value"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf.properties.conc_mol_m3]
+description = "Concentration [mol/m³]"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf.properties.conc_mol_m3.items]
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf.properties.temp_K]
+description = "Temperature [K]"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf.properties.temp_K.items]
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf.properties.value]
+description = "Property values (same length)"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf.properties.value.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution]
+description = "PSD (d50 → radius)"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution.anyOf]]
+additionalProperties = false
+description = "Particle size distribution. d50 used for PyBaMM radius."
+required = ["d50_um"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.dmin_um]
+description = "Minimum diameter [µm]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.dmin_um.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.dmin_um.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.d10_um]
+description = "10th percentile [µm]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.d10_um.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.d10_um.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.d50_um]
+description = "Median diameter [µm]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.d90_um]
+description = "90th percentile [µm]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.d90_um.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.d90_um.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.dmax_um]
+description = "Maximum diameter [µm]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.dmax_um.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.dmax_um.anyOf]]
+type = "null"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.particle_size_distribution.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.exchange_current_density_A_m2]
+description = "Electrode exchange current density [A/m²]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.exchange_current_density_A_m2.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.exchange_current_density_A_m2.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.double_layer_capacitance_F_m2]
+description = "Double-layer capacitance [F/m²]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.double_layer_capacitance_F_m2.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_active_materials.items.properties.double_layer_capacitance_F_m2.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials]
+description = "List of active materials in negative electrode formulation"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items]
+additionalProperties = false
+description = "Active material in electrode formulation. Optional OCV data for PyBaMM."
+required = ["name", "mass_fraction", "density_g_cm3", "specific_capacity_mAh_g", "nominal_voltage_V"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.name]
+description = "Material name, e.g. 'NMC811', 'LFP', 'Graphite'"
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.mass_fraction]
+description = "Mass fraction in electrode formulation"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.density_g_cm3]
+description = "True density [g/cm³]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.specific_capacity_mAh_g]
+description = "Reversible specific capacity [mAh/g]"
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.nominal_voltage_V]
+description = "Midpoint voltage vs Li/Li⁺ [V]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.soc_pct]
+description = "State of charge [0-100%]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.soc_pct.anyOf]]
+minItems = 2
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.soc_pct.anyOf.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.soc_pct.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.ch_ocv_V]
+description = "OCV during charge [V]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.ch_ocv_V.anyOf]]
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.ch_ocv_V.anyOf.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.ch_ocv_V.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.dch_ocv_V]
+description = "OCV during discharge [V]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.dch_ocv_V.anyOf]]
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.dch_ocv_V.anyOf.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.dch_ocv_V.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.ocv_specific_capacity_mAh_g]
+description = "Specific capacity [mAh/g] per point"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.ocv_specific_capacity_mAh_g.anyOf]]
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.ocv_specific_capacity_mAh_g.anyOf.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.ocv_specific_capacity_mAh_g.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.max_lithium_conc_mol_m3]
+description = "Max Li concentration [mol/m³]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.max_lithium_conc_mol_m3.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.max_lithium_conc_mol_m3.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.diffusivity_m2_s]
+description = "Particle diffusivity [m²/s]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf]]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf]]
+additionalProperties = false
+description = "Tabulated ionic transport property (conc, temp -> value)."
+required = ["conc_mol_m3", "temp_K", "value"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf.properties.conc_mol_m3]
+description = "Concentration [mol/m³]"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf.properties.conc_mol_m3.items]
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf.properties.temp_K]
+description = "Temperature [K]"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf.properties.temp_K.items]
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf.properties.value]
+description = "Property values (same length)"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf.properties.value.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.diffusivity_m2_s.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution]
+description = "PSD (d50 → radius)"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution.anyOf]]
+additionalProperties = false
+description = "Particle size distribution. d50 used for PyBaMM radius."
+required = ["d50_um"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.dmin_um]
+description = "Minimum diameter [µm]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.dmin_um.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.dmin_um.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.d10_um]
+description = "10th percentile [µm]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.d10_um.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.d10_um.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.d50_um]
+description = "Median diameter [µm]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.d90_um]
+description = "90th percentile [µm]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.d90_um.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.d90_um.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.dmax_um]
+description = "Maximum diameter [µm]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.dmax_um.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution.anyOf.properties.dmax_um.anyOf]]
+type = "null"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.particle_size_distribution.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.exchange_current_density_A_m2]
+description = "Electrode exchange current density [A/m²]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.exchange_current_density_A_m2.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.exchange_current_density_A_m2.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.double_layer_capacitance_F_m2]
+description = "Double-layer capacitance [F/m²]"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.double_layer_capacitance_F_m2.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_active_materials.items.properties.double_layer_capacitance_F_m2.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_binders]
+description = "List of binders in positive electrode formulation"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_binders.items]
+additionalProperties = false
+required = ["name", "mass_fraction", "density_g_cm3"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_binders.items.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_binders.items.properties.name]
+description = "Binder name"
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_binders.items.properties.mass_fraction]
+description = "Mass fraction in electrode formulation"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_binders.items.properties.density_g_cm3]
+description = "Density [g/cm³]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_binders]
+description = "List of binders in negative electrode formulation"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_binders.items]
+additionalProperties = false
+required = ["name", "mass_fraction", "density_g_cm3"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_binders.items.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_binders.items.properties.name]
+description = "Binder name"
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_binders.items.properties.mass_fraction]
+description = "Mass fraction in electrode formulation"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_binders.items.properties.density_g_cm3]
+description = "Density [g/cm³]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_conductive_agents]
+description = "List of conductive agents in positive electrode formulation"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_conductive_agents.items]
+additionalProperties = false
+required = ["name", "mass_fraction", "density_g_cm3"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_conductive_agents.items.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_conductive_agents.items.properties.name]
+description = "Conductive agent name"
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_conductive_agents.items.properties.mass_fraction]
+description = "Mass fraction in electrode formulation"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_conductive_agents.items.properties.density_g_cm3]
+description = "Density [g/cm³]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_conductive_agents]
+description = "List of conductive agents in negative electrode formulation (can be empty)"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_conductive_agents.items]
+additionalProperties = false
+required = ["name", "mass_fraction", "density_g_cm3"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_conductive_agents.items.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_conductive_agents.items.properties.name]
+description = "Conductive agent name"
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_conductive_agents.items.properties.mass_fraction]
+description = "Mass fraction in electrode formulation"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_conductive_agents.items.properties.density_g_cm3]
+description = "Density [g/cm³]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_foil_thickness_um]
+description = "Positive electrode foil thickness [µm]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_foil_thickness_um]
+description = "Negative electrode foil thickness [µm]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_foil_density_g_cm3]
+description = "Positive electrode foil density [g/cm³]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_foil_density_g_cm3]
+description = "Negative electrode foil density [g/cm³]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_foil_electronic_conductivity_S_m]
+description = "Positive electrode foil electronic conductivity [S/m]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_foil_electronic_conductivity_S_m]
+description = "Negative electrode foil electronic conductivity [S/m]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_foil_specific_heat_capacity_J_kg_K]
+description = "Positive electrode foil specific heat capacity [J/kg/K]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_foil_specific_heat_capacity_J_kg_K]
+description = "Negative electrode foil specific heat capacity [J/kg/K]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_foil_thermal_conductivity_W_m_K]
+description = "Positive electrode foil thermal conductivity [W/m/K]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_foil_thermal_conductivity_W_m_K]
+description = "Negative electrode foil thermal conductivity [W/m/K]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.separator_sheet_count]
+description = "Separator sheet count"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.separator_sheet_width_mm]
+description = "Separator sheet width [mm]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.separator_sheet_height_mm]
+description = "Separator sheet height [mm]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.separator_thickness_um]
+description = "Separator thickness [µm]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.separator_porosity]
+description = "Separator porosity"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.separator_density_g_cm3]
+description = "Separator density [g/cm³]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.separator_specific_heat_capacity_J_kg_K]
+description = "Separator specific heat capacity [J/kg/K]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.separator_thermal_conductivity_W_m_K]
+description = "Separator thermal conductivity [W/m/K]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte_density_g_cm3]
+description = "Electrolyte density [g/cm³]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte_fill_ratio]
+description = "Electrolyte fill ratio"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte]
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf]]
+additionalProperties = false
+required = ["name", "composition"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.name]
+description = "Electrolyte name"
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition]
+additionalProperties = false
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.solvents]
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.solvents.items]
+additionalProperties = false
+required = ["name", "density_g_cm3", "molar_vol_cm3_mol", "molar_mass_g_mol", "vol_frac"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.solvents.items.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.solvents.items.properties.name]
+description = "Solvent name"
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.solvents.items.properties.density_g_cm3]
+description = "Density [g/cm³]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.solvents.items.properties.molar_vol_cm3_mol]
+description = "Molar volume [cm³/mol]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.solvents.items.properties.molar_mass_g_mol]
+description = "Molar mass [g/mol]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.solvents.items.properties.vol_frac]
+description = "Volume fraction in electrolyte formulation"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.salts]
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.salts.items]
+additionalProperties = false
+required = ["name", "density_g_cm3", "molar_vol_cm3_mol", "molar_mass_g_mol", "mass_fraction"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.salts.items.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.salts.items.properties.name]
+description = "Salt name"
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.salts.items.properties.density_g_cm3]
+description = "Density [g/cm³]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.salts.items.properties.molar_vol_cm3_mol]
+description = "Molar volume [cm³/mol]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.salts.items.properties.molar_mass_g_mol]
+description = "Molar mass [g/mol]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.salts.items.properties.mass_fraction]
+description = "Mass fraction in electrolyte formulation"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.additives]
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.additives.items]
+additionalProperties = false
+required = ["name", "density_g_cm3", "molar_vol_cm3_mol", "molar_mass_g_mol", "mass_fraction"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.additives.items.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.additives.items.properties.name]
+description = "Additive name"
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.additives.items.properties.density_g_cm3]
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.additives.items.properties.molar_vol_cm3_mol]
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.additives.items.properties.molar_mass_g_mol]
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.composition.properties.additives.items.properties.mass_fraction]
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_conductivity_S_m]
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_conductivity_S_m.anyOf]]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_conductivity_S_m.anyOf]]
+additionalProperties = false
+description = "Tabulated ionic transport property (conc, temp -> value)."
+required = ["conc_mol_m3", "temp_K", "value"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_conductivity_S_m.anyOf.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_conductivity_S_m.anyOf.properties.conc_mol_m3]
+description = "Concentration [mol/m³]"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_conductivity_S_m.anyOf.properties.conc_mol_m3.items]
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_conductivity_S_m.anyOf.properties.temp_K]
+description = "Temperature [K]"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_conductivity_S_m.anyOf.properties.temp_K.items]
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_conductivity_S_m.anyOf.properties.value]
+description = "Property values (same length)"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_conductivity_S_m.anyOf.properties.value.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_conductivity_S_m.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_diffusivity_m2_s]
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_diffusivity_m2_s.anyOf]]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_diffusivity_m2_s.anyOf]]
+additionalProperties = false
+description = "Tabulated ionic transport property (conc, temp -> value)."
+required = ["conc_mol_m3", "temp_K", "value"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_diffusivity_m2_s.anyOf.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_diffusivity_m2_s.anyOf.properties.conc_mol_m3]
+description = "Concentration [mol/m³]"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_diffusivity_m2_s.anyOf.properties.conc_mol_m3.items]
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_diffusivity_m2_s.anyOf.properties.temp_K]
+description = "Temperature [K]"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_diffusivity_m2_s.anyOf.properties.temp_K.items]
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_diffusivity_m2_s.anyOf.properties.value]
+description = "Property values (same length)"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_diffusivity_m2_s.anyOf.properties.value.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.ionic_diffusivity_m2_s.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.transference_number]
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.transference_number.anyOf]]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.transference_number.anyOf]]
+additionalProperties = false
+description = "Tabulated ionic transport property (conc, temp -> value)."
+required = ["conc_mol_m3", "temp_K", "value"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.transference_number.anyOf.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.transference_number.anyOf.properties.conc_mol_m3]
+description = "Concentration [mol/m³]"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.transference_number.anyOf.properties.conc_mol_m3.items]
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.transference_number.anyOf.properties.temp_K]
+description = "Temperature [K]"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.transference_number.anyOf.properties.temp_K.items]
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.transference_number.anyOf.properties.value]
+description = "Property values (same length)"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.transference_number.anyOf.properties.value.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.transference_number.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.activity_coefficient]
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.activity_coefficient.anyOf]]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.activity_coefficient.anyOf]]
+additionalProperties = false
+description = "Tabulated ionic transport property (conc, temp -> value)."
+required = ["conc_mol_m3", "temp_K", "value"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.activity_coefficient.anyOf.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.activity_coefficient.anyOf.properties.conc_mol_m3]
+description = "Concentration [mol/m³]"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.activity_coefficient.anyOf.properties.conc_mol_m3.items]
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.activity_coefficient.anyOf.properties.temp_K]
+description = "Temperature [K]"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.activity_coefficient.anyOf.properties.temp_K.items]
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.activity_coefficient.anyOf.properties.value]
+description = "Property values (same length)"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.activity_coefficient.anyOf.properties.value.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf.properties.activity_coefficient.anyOf]]
+type = "null"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrolyte.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.casing_thickness_mm]
+description = "Casing thickness [mm]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.casing_density_g_cm3]
+description = "Casing density [g/cm³]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.electrode_overhang_mm]
+description = "Electrode overhang [mm]"
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.jelly_roll_inner_diameter_mm]
+description = "Jelly roll inner diameter [mm]"
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.volume_packing_ratio]
+description = "Volume packing ratio"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_ocv]
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_ocv.anyOf]]
+additionalProperties = false
+required = ["soc_pct", "specific_capacity_mAh_g", "ch_ocv_V", "dch_ocv_V"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_ocv.anyOf.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_ocv.anyOf.properties.soc_pct]
+description = "State of charge [0-100%]"
+minItems = 2
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_ocv.anyOf.properties.soc_pct.items]
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_ocv.anyOf.properties.specific_capacity_mAh_g]
+description = "Specific capacity [mAh/g]"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_ocv.anyOf.properties.specific_capacity_mAh_g.items]
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_ocv.anyOf.properties.ch_ocv_V]
+description = "Charge OCV [V]"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_ocv.anyOf.properties.ch_ocv_V.items]
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_ocv.anyOf.properties.dch_ocv_V]
+description = "Discharge OCV [V]"
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_ocv.anyOf.properties.dch_ocv_V.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_ocv.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_pore_tortuosity]
+description = "Tortuosity factor for positive electrode (applied to both electrolyte and solid phases unless solid-phase override is set)"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_pore_tortuosity.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_pore_tortuosity.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_pore_tortuosity]
+description = "Tortuosity factor for negative electrode (applied to both electrolyte and solid phases unless solid-phase override is set)"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_pore_tortuosity.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_pore_tortuosity.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.separator_tortuosity]
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.separator_tortuosity.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.separator_tortuosity.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_solid_tortuosity]
+description = "Solid-phase tortuosity for positive electrode (if different from electrolyte-phase)"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_solid_tortuosity.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.positive_electrode_solid_tortuosity.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_solid_tortuosity]
+description = "Solid-phase tortuosity for negative electrode (if different from electrolyte-phase)"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_solid_tortuosity.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.negative_electrode_solid_tortuosity.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.upper_voltage_cutoff_V]
+description = "Upper voltage cutoff for simulations [V]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.lower_voltage_cutoff_V]
+description = "Lower voltage cutoff for simulations [V]"
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_contact_resistance_Ohm]
+description = "Cell contact resistance [Ohm]. Used as fallback when simulation_parameters.cell_contact_resistance_Ohm is not set."
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_contact_resistance_Ohm.anyOf]]
+minimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.cell_parameters.properties.cell_contact_resistance_Ohm.anyOf]]
+type = "null"
 
 [wrapper.input_schema.properties.designs.items.properties.simulation_parameters]
+description = "Per-design test protocol. Replaces the batch-level one entirely for this design — it is not merged into it."
+required = ["calibration_rate_C", "first_cycle_coulombic_loss_pct", "ambient_temperature_K", "reference_cell_temperature_K", "rpt_dcir", "rpt_power", "start_soc_pct", "upper_voltage_cutoff_V", "lower_voltage_cutoff_V", "cell_contact_resistance_Ohm", "cell_cooling_surface_area_m2", "cell_heat_transfer_coefficient_W_m2_K", "anode_potential_safety_threshold_V", "temperature_safety_threshold_K"]
 type = "object"
-description = "Per-design test protocol. Overrides the batch-level one entirely."
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.solver_atol]
+default = 0.001
+description = "Solver absolute tolerance"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.solver_rtol]
+default = 0.001
+description = "Solver relative tolerance"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.calibration_rate_C]
+description = "Model capacity calibration rate [C]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.mesh_resolution]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.mesh_resolution.additionalProperties]
+type = "integer"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.data_sampling_period_s]
+default = 0.1
+description = "Data sampling period [s]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.first_cycle_coulombic_loss_pct]
+description = "First-cycle coulombic loss for initial electrode balancing[%]"
+maximum = 100
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.ambient_temperature_K]
+description = "Ambient temperature for simulation [K]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.initial_cell_temperature_K]
+description = "Initial cell temperature for simulation [K]"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.initial_cell_temperature_K.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.initial_cell_temperature_K.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.reference_cell_temperature_K]
+description = "Reference cell temperature for performance test [K]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.perform_rpt]
+default = false
+description = "Whether to perform reference performance test (RPT)"
+type = "boolean"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_dcir]
+description = "Parameters for DCIR measurement pulse for reference performance test (RPT)"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_dcir.anyOf]]
+required = ["dcir_c_rate", "dcir_direction", "dcir_soc_pct", "dcir_temperature_K", "dcir_pulse_duration_s"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_dcir.anyOf.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_dcir.anyOf.properties.dcir_c_rate]
+description = "DCIR pulse C-rate"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_dcir.anyOf.properties.dcir_direction]
+description = "DCIR pulse direction"
+enum = ["charge", "discharge"]
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_dcir.anyOf.properties.dcir_soc_pct]
+description = "DCIR pulse SOC [%]"
+maximum = 100
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_dcir.anyOf.properties.dcir_temperature_K]
+description = "DCIR pulse temperature [K]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_dcir.anyOf.properties.dcir_pulse_duration_s]
+description = "DCIR pulse duration [s]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_dcir.anyOf.properties.dcir_rest_s]
+default = 1.0
+description = "Rest time before DCIR pulse (pre-pulse rest) [s]"
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_dcir.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_power]
+description = "Parameters for power measurement pulse for reference performance test (RPT)"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_power.anyOf]]
+required = ["power_level_W", "power_duration_s", "power_direction", "power_soc_pct", "power_temperature_K"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_power.anyOf.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_power.anyOf.properties.power_level_W]
+description = "Power pulse level [W]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_power.anyOf.properties.power_duration_s]
+description = "Power pulse duration [s]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_power.anyOf.properties.power_direction]
+description = "Power pulse direction"
+enum = ["charge", "discharge"]
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_power.anyOf.properties.power_soc_pct]
+description = "Power pulse SOC [%]"
+maximum = 100
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_power.anyOf.properties.power_temperature_K]
+description = "Power pulse temperature [K]"
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.rpt_power.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.start_soc_pct]
+description = "Starting state of charge for load cycle simulation [%]"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.start_soc_pct.anyOf]]
+maximum = 100
+minimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.start_soc_pct.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.use_pybamm_params]
+default = ""
+description = "PyBaMM parameter set to use (e.g. 'Chen2020') or 'custom' string to use custom params"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.use_pybamm_params.anyOf]]
+type = "string"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.use_pybamm_params.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.upper_voltage_cutoff_V]
+description = "Upper voltage cutoff for simulations [V]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.lower_voltage_cutoff_V]
+description = "Lower voltage cutoff for simulations [V]"
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.cell_contact_resistance_Ohm]
+description = "Cell contact resistance [Ohm]. If None, falls back to cell_parameters value (default 1e-4)."
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.cell_contact_resistance_Ohm.anyOf]]
+minimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.cell_contact_resistance_Ohm.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.cell_cooling_surface_area_m2]
+description = "Cell cooling surface area [m²]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.cell_heat_transfer_coefficient_W_m2_K]
+description = "Cell heat transfer coefficient [W/m²/K]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.anode_potential_safety_threshold_V]
+description = "Anode potential safety threshold [V]"
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.temperature_safety_threshold_K]
+description = "Temperature safety threshold [K]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.positive_electrode_ocv_model]
+default = "polynomial"
+description = "OCV model for positive electrode in PyBaMM"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.positive_electrode_ocv_model.anyOf]]
+enum = ["msmr", "polynomial", "interpolant"]
+type = "string"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.positive_electrode_ocv_model.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.negative_electrode_ocv_model]
+default = "polynomial"
+description = "OCV model for negative electrode in PyBaMM"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.negative_electrode_ocv_model.anyOf]]
+enum = ["msmr", "polynomial", "interpolant"]
+type = "string"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.negative_electrode_ocv_model.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.particle_diffusion_model]
+default = "Fickian diffusion"
+description = "Particle diffusion model for PyBaMM simulations. 'Fickian diffusion' (default) solves the full diffusion PDE inside each particle. 'uniform profile' assumes spatially uniform concentration (fastest, lowest accuracy). 'quadratic profile' and 'quartic profile' are polynomial approximations that trade some accuracy for speed."
+enum = ["Fickian diffusion", "uniform profile", "quadratic profile", "quartic profile"]
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.negative_electrode_phases]
+default = 1
+description = "Number of particle phases in the negative electrode. 1 = single-phase (default). 2 = composite (e.g. graphite-silicon blend). When set to 2, phase-specific parameters ('Primary: ...' / 'Secondary: ...') must be present in the PyBaMM parameter set."
+enum = [1, 2]
+type = "integer"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.positive_electrode_phases]
+default = 1
+description = "Number of particle phases in the positive electrode. 1 = single-phase (default). 2 = composite. When set to 2, phase-specific parameters ('Primary: ...' / 'Secondary: ...') must be present in the PyBaMM parameter set."
+enum = [1, 2]
+type = "integer"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.timeseries_rdp_epsilon]
+default = 0.001
+description = "RDP algorithm tolerance for subsampling in timeseries output"
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments]
+description = "Optional list of multi-step / multi-cycle PyBaMM experiments. Each experiment produces an ExperimentOutput keyed by its label in experiment_results. Independent of perform_rpt."
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf]]
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items]
+additionalProperties = false
+description = "Configuration for a multi-step / multi-cycle PyBaMM experiment.\n\n``steps`` defines the sequence of operations in a single cycle, expressed\nas PyBaMM step strings (e.g. ``\"Discharge at 1C until 3.0 V\"``).  The\ncycle is repeated ``n_cycles`` times.\n\nExample (3-cycle charge-discharge):\n    ExperimentConfig(\n        label=\"cycle_aging\",\n        steps=[\n            \"Discharge at 1C until 3.0 V\",\n            \"Rest for 10 minutes\",\n            \"Charge at 1C until 4.2 V\",\n            \"Hold at 4.2 V until C/20\",\n            \"Rest for 10 minutes\",\n        ],\n        n_cycles=3,\n    )"
+required = ["label", "steps", "n_cycles", "period_s", "temperature_K", "initial_soc_pct"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.label]
+description = "Key used in the output dict."
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps]
+description = "Ordered list of steps forming one cycle.  Each element is either a PyBaMM step string, a DriveStepConfig (time-varying profile), or an EISStepConfig (impedance snapshot)."
+minItems = 1
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items]
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf]]
+type = "string"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf]]
+additionalProperties = false
+description = "Time-varying drive cycle step using a (time, value) profile.\n\nExactly one of ``current_A``, ``power_W``, or ``c_rate`` must be supplied.\nThe profile length must match ``time_s``.\n\nExample — 30-second power pulse followed by zero:\n    DriveStepConfig(\n        kind=\"drive_cycle\",\n        time_s=[0, 30, 30.01, 60],\n        power_W=[50.0, 50.0, 0.0, 0.0],\n    )"
+required = ["time_s"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.kind]
+const = "drive_cycle"
+default = "drive_cycle"
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.time_s]
+description = "Time points [s]."
+minItems = 2
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.time_s.items]
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.current_A]
+description = "Current profile [A]. Positive = discharge."
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.current_A.anyOf]]
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.current_A.anyOf.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.current_A.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.power_W]
+description = "Power profile [W]. Positive = discharge."
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.power_W.anyOf]]
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.power_W.anyOf.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.power_W.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.c_rate]
+description = "C-rate profile. Positive = discharge."
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.c_rate.anyOf]]
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.c_rate.anyOf.items]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.c_rate.anyOf]]
+type = "null"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf]]
+additionalProperties = false
+description = "EIS snapshot step — runs a frequency-domain impedance sweep at the current\nbattery state without advancing simulation time.\n\nRequires ``pybammeis`` to be installed (``pip install pybammeis``).\nIf the package is absent the step is skipped and a warning is logged /\nsurfaced in ``ExperimentOutput.warnings``."
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.kind]
+const = "eis"
+default = "eis"
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.freq_min_hz]
+default = 0.0001
+description = "Minimum frequency [Hz]."
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.freq_max_hz]
+default = 10000.0
+description = "Maximum frequency [Hz]."
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.n_frequencies]
+default = 30
+description = "Number of log-spaced frequency points."
+minimum = 2
+type = "integer"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.method]
+default = "direct"
+description = "Linear solver method used by pybammeis."
+enum = ["direct", "prebicgstab", "bicgstab"]
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.n_cycles]
+description = "Number of times to repeat the cycle."
+minimum = 1
+type = "integer"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations]
+description = "Optional custom termination conditions applied to every step. A triggered condition ends the current step only (PyBaMM step-level semantics); the experiment continues with subsequent steps and cycles."
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf]]
+type = "array"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf.items]
+additionalProperties = false
+description = "Custom termination condition applied to every step in a PyBaMM experiment.\n\nAt each solver step, PyBaMM evaluates an event function that is configured\nbased on ``comparison``:\n\n- ``comparison='less_than'``: ``f(variables) = variables[variable] - threshold``\n- ``comparison='greater_than'``: ``f(variables) = threshold - variables[variable]``\n\nIn both cases, the step terminates when the event function becomes\nnon-positive (``f(variables) <= 0``), i.e. when the monitored variable\nhas crossed the specified threshold in the requested direction.\nExample — stop when anode potential drops below 0 V:\n    ExperimentTermination(variable=\"Anode potential [V]\", threshold=0.0)"
+required = ["variable", "threshold"]
+type = "object"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf.items.properties]
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf.items.properties.variable]
+description = "PyBaMM variable name to monitor, e.g. 'Anode potential [V]' or 'Cell temperature [K]'."
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf.items.properties.threshold]
+description = "Threshold value for the termination."
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf.items.properties.comparison]
+default = "less_than"
+description = "'less_than': terminate when variable < threshold. 'greater_than': terminate when variable > threshold."
+enum = ["less_than", "greater_than"]
+type = "string"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf.items.properties.name]
+description = "Human-readable name used in logging; auto-generated if None."
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf.items.properties.name.anyOf]]
+type = "string"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf.items.properties.name.anyOf]]
+type = "null"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.period_s]
+description = "Solver output sampling period [s]."
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.temperature_K]
+description = "Ambient temperature for this experiment [K]."
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf.items.properties.initial_soc_pct]
+description = "Initial state of charge [%] before the experiment begins."
+maximum = 100
+minimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.experiments.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.enable_double_layer_capacitance]
+default = false
+description = "Enable double-layer capacitance (C_dl) in the SPMe model. Adds a non-Faradaic capacitive current term to the total interfacial current: j_total = j_BV + C_dl * d(phi_s - phi_e)/dt. Required for hybrid lithium-ion capacitor (LIC) simulations, e.g. activated-carbon EDLC positive + hard-carbon intercalation negative. Set per-electrode C_dl via positive/negative_electrode_double_layer_capacitance_F_m2. PyBaMM default C_dl is 0.2 F/m² when this is enabled and no override is provided."
+type = "boolean"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.positive_electrode_double_layer_capacitance_F_m2]
+description = "Double-layer capacitance of the positive electrode [F.m-2]. Only used when enable_double_layer_capacitance=True. Typical values: activated carbon EDLC ~0.1-0.4 F/m2, intercalation electrode ~0.01-0.05 F/m2. Defaults to the PyBaMM built-in value (~0.2 F/m²) when not set."
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.positive_electrode_double_layer_capacitance_F_m2.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.positive_electrode_double_layer_capacitance_F_m2.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.negative_electrode_double_layer_capacitance_F_m2]
+description = "Double-layer capacitance of the negative electrode [F.m-2]. Only used when enable_double_layer_capacitance=True. Typical values: hard carbon ~0.01-0.05 F/m2, graphite ~0.01 F/m2, activated carbon EDLC ~0.1-0.4 F/m2. Defaults to the PyBaMM built-in value (~0.2 F/m²) when not set."
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.negative_electrode_double_layer_capacitance_F_m2.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.negative_electrode_double_layer_capacitance_F_m2.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.working_electrode]
+description = "Optional working electrode for half-cell simulation. Set to 'positive' to simulate a half-cell with the positive electrode as the working electrode against a counter/reference electrode. The counter electrode defaults to lithium metal (OCP=0 V); use the reference_electrode_* fields to configure any other counter electrode (Na metal, pseudo-reference, Li alloy, etc.). To simulate a negative electrode half-cell (e.g. graphite vs counter), load the negative electrode material parameters into the positive electrode slots and set this to 'positive'. None (default) runs a full-cell simulation. Incompatible with perform_rpt=True."
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.working_electrode.anyOf]]
+const = "positive"
+type = "string"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.working_electrode.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.reference_electrode_exchange_current_density_A_m2]
+description = "Exchange-current density for the counter/reference electrode [A.m-2]. Only used in half-cell mode (working_electrode='positive'). Applies to any counter electrode — Li metal, Na metal, pseudo-reference, etc. When None (default) the Xu2019 Li-metal function is used as a baseline: j0 = 3.5e-8 * F * c_Li^0.7 * c_e^0.3. Set to a positive scalar to override with a constant value appropriate for your counter electrode material."
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.reference_electrode_exchange_current_density_A_m2.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.reference_electrode_exchange_current_density_A_m2.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.reference_electrode_ocp_V]
+description = "Open-circuit potential of the counter/reference electrode [V]. Only used in half-cell mode (working_electrode='positive'). Applies to any counter electrode — Li metal (0.0 V), Na metal (~0.3 V vs Li/Li+), pseudo-reference, lithium alloy, etc. Defaults to 0.0 V. Set to the known equilibrium potential of your counter electrode."
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.reference_electrode_ocp_V.anyOf]]
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.reference_electrode_ocp_V.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.reference_electrode_charge_transfer_coefficient]
+description = "Butler-Volmer charge transfer coefficient for the counter/reference electrode (dimensionless, 0 < alpha < 1). Only used in half-cell mode (working_electrode='positive'). Applies to any counter electrode material. Defaults to 0.5 (symmetric kinetics). Controls the asymmetry of the anodic and cathodic reaction rates."
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.reference_electrode_charge_transfer_coefficient.anyOf]]
+exclusiveMaximum = 1
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.designs.items.properties.simulation_parameters.properties.reference_electrode_charge_transfer_coefficient.anyOf]]
+type = "null"
 
 [wrapper.input_schema.properties.simulation_parameters]
-type = "object"
 description = "Test protocol shared by every design that doesn't declare its own."
+required = ["calibration_rate_C", "first_cycle_coulombic_loss_pct", "ambient_temperature_K", "reference_cell_temperature_K", "rpt_dcir", "rpt_power", "start_soc_pct", "upper_voltage_cutoff_V", "lower_voltage_cutoff_V", "cell_contact_resistance_Ohm", "cell_cooling_surface_area_m2", "cell_heat_transfer_coefficient_W_m2_K", "anode_potential_safety_threshold_V", "temperature_safety_threshold_K"]
+type = "object"
+
+[wrapper.input_schema.properties.simulation_parameters.properties]
+
+[wrapper.input_schema.properties.simulation_parameters.properties.solver_atol]
+default = 0.001
+description = "Solver absolute tolerance"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.solver_rtol]
+default = 0.001
+description = "Solver relative tolerance"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.calibration_rate_C]
+description = "Model capacity calibration rate [C]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.mesh_resolution]
+type = "object"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.mesh_resolution.additionalProperties]
+type = "integer"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.data_sampling_period_s]
+default = 0.1
+description = "Data sampling period [s]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.first_cycle_coulombic_loss_pct]
+description = "First-cycle coulombic loss for initial electrode balancing[%]"
+maximum = 100
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.ambient_temperature_K]
+description = "Ambient temperature for simulation [K]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.initial_cell_temperature_K]
+description = "Initial cell temperature for simulation [K]"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.initial_cell_temperature_K.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.initial_cell_temperature_K.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.reference_cell_temperature_K]
+description = "Reference cell temperature for performance test [K]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.perform_rpt]
+default = false
+description = "Whether to perform reference performance test (RPT)"
+type = "boolean"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.rpt_dcir]
+description = "Parameters for DCIR measurement pulse for reference performance test (RPT)"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.rpt_dcir.anyOf]]
+required = ["dcir_c_rate", "dcir_direction", "dcir_soc_pct", "dcir_temperature_K", "dcir_pulse_duration_s"]
+type = "object"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.rpt_dcir.anyOf.properties]
+
+[wrapper.input_schema.properties.simulation_parameters.properties.rpt_dcir.anyOf.properties.dcir_c_rate]
+description = "DCIR pulse C-rate"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.rpt_dcir.anyOf.properties.dcir_direction]
+description = "DCIR pulse direction"
+enum = ["charge", "discharge"]
+type = "string"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.rpt_dcir.anyOf.properties.dcir_soc_pct]
+description = "DCIR pulse SOC [%]"
+maximum = 100
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.rpt_dcir.anyOf.properties.dcir_temperature_K]
+description = "DCIR pulse temperature [K]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.rpt_dcir.anyOf.properties.dcir_pulse_duration_s]
+description = "DCIR pulse duration [s]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.rpt_dcir.anyOf.properties.dcir_rest_s]
+default = 1.0
+description = "Rest time before DCIR pulse (pre-pulse rest) [s]"
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.rpt_dcir.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.rpt_power]
+description = "Parameters for power measurement pulse for reference performance test (RPT)"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.rpt_power.anyOf]]
+required = ["power_level_W", "power_duration_s", "power_direction", "power_soc_pct", "power_temperature_K"]
+type = "object"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.rpt_power.anyOf.properties]
+
+[wrapper.input_schema.properties.simulation_parameters.properties.rpt_power.anyOf.properties.power_level_W]
+description = "Power pulse level [W]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.rpt_power.anyOf.properties.power_duration_s]
+description = "Power pulse duration [s]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.rpt_power.anyOf.properties.power_direction]
+description = "Power pulse direction"
+enum = ["charge", "discharge"]
+type = "string"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.rpt_power.anyOf.properties.power_soc_pct]
+description = "Power pulse SOC [%]"
+maximum = 100
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.rpt_power.anyOf.properties.power_temperature_K]
+description = "Power pulse temperature [K]"
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.rpt_power.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.start_soc_pct]
+description = "Starting state of charge for load cycle simulation [%]"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.start_soc_pct.anyOf]]
+maximum = 100
+minimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.start_soc_pct.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.use_pybamm_params]
+default = ""
+description = "PyBaMM parameter set to use (e.g. 'Chen2020') or 'custom' string to use custom params"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.use_pybamm_params.anyOf]]
+type = "string"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.use_pybamm_params.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.upper_voltage_cutoff_V]
+description = "Upper voltage cutoff for simulations [V]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.lower_voltage_cutoff_V]
+description = "Lower voltage cutoff for simulations [V]"
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.cell_contact_resistance_Ohm]
+description = "Cell contact resistance [Ohm]. If None, falls back to cell_parameters value (default 1e-4)."
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.cell_contact_resistance_Ohm.anyOf]]
+minimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.cell_contact_resistance_Ohm.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.cell_cooling_surface_area_m2]
+description = "Cell cooling surface area [m²]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.cell_heat_transfer_coefficient_W_m2_K]
+description = "Cell heat transfer coefficient [W/m²/K]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.anode_potential_safety_threshold_V]
+description = "Anode potential safety threshold [V]"
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.temperature_safety_threshold_K]
+description = "Temperature safety threshold [K]"
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.positive_electrode_ocv_model]
+default = "polynomial"
+description = "OCV model for positive electrode in PyBaMM"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.positive_electrode_ocv_model.anyOf]]
+enum = ["msmr", "polynomial", "interpolant"]
+type = "string"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.positive_electrode_ocv_model.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.negative_electrode_ocv_model]
+default = "polynomial"
+description = "OCV model for negative electrode in PyBaMM"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.negative_electrode_ocv_model.anyOf]]
+enum = ["msmr", "polynomial", "interpolant"]
+type = "string"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.negative_electrode_ocv_model.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.particle_diffusion_model]
+default = "Fickian diffusion"
+description = "Particle diffusion model for PyBaMM simulations. 'Fickian diffusion' (default) solves the full diffusion PDE inside each particle. 'uniform profile' assumes spatially uniform concentration (fastest, lowest accuracy). 'quadratic profile' and 'quartic profile' are polynomial approximations that trade some accuracy for speed."
+enum = ["Fickian diffusion", "uniform profile", "quadratic profile", "quartic profile"]
+type = "string"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.negative_electrode_phases]
+default = 1
+description = "Number of particle phases in the negative electrode. 1 = single-phase (default). 2 = composite (e.g. graphite-silicon blend). When set to 2, phase-specific parameters ('Primary: ...' / 'Secondary: ...') must be present in the PyBaMM parameter set."
+enum = [1, 2]
+type = "integer"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.positive_electrode_phases]
+default = 1
+description = "Number of particle phases in the positive electrode. 1 = single-phase (default). 2 = composite. When set to 2, phase-specific parameters ('Primary: ...' / 'Secondary: ...') must be present in the PyBaMM parameter set."
+enum = [1, 2]
+type = "integer"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.timeseries_rdp_epsilon]
+default = 0.001
+description = "RDP algorithm tolerance for subsampling in timeseries output"
+minimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments]
+description = "Optional list of multi-step / multi-cycle PyBaMM experiments. Each experiment produces an ExperimentOutput keyed by its label in experiment_results. Independent of perform_rpt."
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf]]
+type = "array"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items]
+additionalProperties = false
+description = "Configuration for a multi-step / multi-cycle PyBaMM experiment.\n\n``steps`` defines the sequence of operations in a single cycle, expressed\nas PyBaMM step strings (e.g. ``\"Discharge at 1C until 3.0 V\"``).  The\ncycle is repeated ``n_cycles`` times.\n\nExample (3-cycle charge-discharge):\n    ExperimentConfig(\n        label=\"cycle_aging\",\n        steps=[\n            \"Discharge at 1C until 3.0 V\",\n            \"Rest for 10 minutes\",\n            \"Charge at 1C until 4.2 V\",\n            \"Hold at 4.2 V until C/20\",\n            \"Rest for 10 minutes\",\n        ],\n        n_cycles=3,\n    )"
+required = ["label", "steps", "n_cycles", "period_s", "temperature_K", "initial_soc_pct"]
+type = "object"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties]
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.label]
+description = "Key used in the output dict."
+type = "string"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps]
+description = "Ordered list of steps forming one cycle.  Each element is either a PyBaMM step string, a DriveStepConfig (time-varying profile), or an EISStepConfig (impedance snapshot)."
+minItems = 1
+type = "array"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items]
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf]]
+type = "string"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf]]
+additionalProperties = false
+description = "Time-varying drive cycle step using a (time, value) profile.\n\nExactly one of ``current_A``, ``power_W``, or ``c_rate`` must be supplied.\nThe profile length must match ``time_s``.\n\nExample — 30-second power pulse followed by zero:\n    DriveStepConfig(\n        kind=\"drive_cycle\",\n        time_s=[0, 30, 30.01, 60],\n        power_W=[50.0, 50.0, 0.0, 0.0],\n    )"
+required = ["time_s"]
+type = "object"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties]
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.kind]
+const = "drive_cycle"
+default = "drive_cycle"
+type = "string"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.time_s]
+description = "Time points [s]."
+minItems = 2
+type = "array"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.time_s.items]
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.current_A]
+description = "Current profile [A]. Positive = discharge."
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.current_A.anyOf]]
+type = "array"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.current_A.anyOf.items]
+type = "number"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.current_A.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.power_W]
+description = "Power profile [W]. Positive = discharge."
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.power_W.anyOf]]
+type = "array"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.power_W.anyOf.items]
+type = "number"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.power_W.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.c_rate]
+description = "C-rate profile. Positive = discharge."
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.c_rate.anyOf]]
+type = "array"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.c_rate.anyOf.items]
+type = "number"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.c_rate.anyOf]]
+type = "null"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf]]
+additionalProperties = false
+description = "EIS snapshot step — runs a frequency-domain impedance sweep at the current\nbattery state without advancing simulation time.\n\nRequires ``pybammeis`` to be installed (``pip install pybammeis``).\nIf the package is absent the step is skipped and a warning is logged /\nsurfaced in ``ExperimentOutput.warnings``."
+type = "object"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties]
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.kind]
+const = "eis"
+default = "eis"
+type = "string"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.freq_min_hz]
+default = 0.0001
+description = "Minimum frequency [Hz]."
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.freq_max_hz]
+default = 10000.0
+description = "Maximum frequency [Hz]."
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.n_frequencies]
+default = 30
+description = "Number of log-spaced frequency points."
+minimum = 2
+type = "integer"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.steps.items.anyOf.properties.method]
+default = "direct"
+description = "Linear solver method used by pybammeis."
+enum = ["direct", "prebicgstab", "bicgstab"]
+type = "string"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.n_cycles]
+description = "Number of times to repeat the cycle."
+minimum = 1
+type = "integer"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations]
+description = "Optional custom termination conditions applied to every step. A triggered condition ends the current step only (PyBaMM step-level semantics); the experiment continues with subsequent steps and cycles."
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf]]
+type = "array"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf.items]
+additionalProperties = false
+description = "Custom termination condition applied to every step in a PyBaMM experiment.\n\nAt each solver step, PyBaMM evaluates an event function that is configured\nbased on ``comparison``:\n\n- ``comparison='less_than'``: ``f(variables) = variables[variable] - threshold``\n- ``comparison='greater_than'``: ``f(variables) = threshold - variables[variable]``\n\nIn both cases, the step terminates when the event function becomes\nnon-positive (``f(variables) <= 0``), i.e. when the monitored variable\nhas crossed the specified threshold in the requested direction.\nExample — stop when anode potential drops below 0 V:\n    ExperimentTermination(variable=\"Anode potential [V]\", threshold=0.0)"
+required = ["variable", "threshold"]
+type = "object"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf.items.properties]
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf.items.properties.variable]
+description = "PyBaMM variable name to monitor, e.g. 'Anode potential [V]' or 'Cell temperature [K]'."
+type = "string"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf.items.properties.threshold]
+description = "Threshold value for the termination."
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf.items.properties.comparison]
+default = "less_than"
+description = "'less_than': terminate when variable < threshold. 'greater_than': terminate when variable > threshold."
+enum = ["less_than", "greater_than"]
+type = "string"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf.items.properties.name]
+description = "Human-readable name used in logging; auto-generated if None."
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf.items.properties.name.anyOf]]
+type = "string"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf.items.properties.name.anyOf]]
+type = "null"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.terminations.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.period_s]
+description = "Solver output sampling period [s]."
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.temperature_K]
+description = "Ambient temperature for this experiment [K]."
+exclusiveMinimum = 0
+type = "number"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf.items.properties.initial_soc_pct]
+description = "Initial state of charge [%] before the experiment begins."
+maximum = 100
+minimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.experiments.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.enable_double_layer_capacitance]
+default = false
+description = "Enable double-layer capacitance (C_dl) in the SPMe model. Adds a non-Faradaic capacitive current term to the total interfacial current: j_total = j_BV + C_dl * d(phi_s - phi_e)/dt. Required for hybrid lithium-ion capacitor (LIC) simulations, e.g. activated-carbon EDLC positive + hard-carbon intercalation negative. Set per-electrode C_dl via positive/negative_electrode_double_layer_capacitance_F_m2. PyBaMM default C_dl is 0.2 F/m² when this is enabled and no override is provided."
+type = "boolean"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.positive_electrode_double_layer_capacitance_F_m2]
+description = "Double-layer capacitance of the positive electrode [F.m-2]. Only used when enable_double_layer_capacitance=True. Typical values: activated carbon EDLC ~0.1-0.4 F/m2, intercalation electrode ~0.01-0.05 F/m2. Defaults to the PyBaMM built-in value (~0.2 F/m²) when not set."
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.positive_electrode_double_layer_capacitance_F_m2.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.positive_electrode_double_layer_capacitance_F_m2.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.negative_electrode_double_layer_capacitance_F_m2]
+description = "Double-layer capacitance of the negative electrode [F.m-2]. Only used when enable_double_layer_capacitance=True. Typical values: hard carbon ~0.01-0.05 F/m2, graphite ~0.01 F/m2, activated carbon EDLC ~0.1-0.4 F/m2. Defaults to the PyBaMM built-in value (~0.2 F/m²) when not set."
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.negative_electrode_double_layer_capacitance_F_m2.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.negative_electrode_double_layer_capacitance_F_m2.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.working_electrode]
+description = "Optional working electrode for half-cell simulation. Set to 'positive' to simulate a half-cell with the positive electrode as the working electrode against a counter/reference electrode. The counter electrode defaults to lithium metal (OCP=0 V); use the reference_electrode_* fields to configure any other counter electrode (Na metal, pseudo-reference, Li alloy, etc.). To simulate a negative electrode half-cell (e.g. graphite vs counter), load the negative electrode material parameters into the positive electrode slots and set this to 'positive'. None (default) runs a full-cell simulation. Incompatible with perform_rpt=True."
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.working_electrode.anyOf]]
+const = "positive"
+type = "string"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.working_electrode.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.reference_electrode_exchange_current_density_A_m2]
+description = "Exchange-current density for the counter/reference electrode [A.m-2]. Only used in half-cell mode (working_electrode='positive'). Applies to any counter electrode — Li metal, Na metal, pseudo-reference, etc. When None (default) the Xu2019 Li-metal function is used as a baseline: j0 = 3.5e-8 * F * c_Li^0.7 * c_e^0.3. Set to a positive scalar to override with a constant value appropriate for your counter electrode material."
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.reference_electrode_exchange_current_density_A_m2.anyOf]]
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.reference_electrode_exchange_current_density_A_m2.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.reference_electrode_ocp_V]
+description = "Open-circuit potential of the counter/reference electrode [V]. Only used in half-cell mode (working_electrode='positive'). Applies to any counter electrode — Li metal (0.0 V), Na metal (~0.3 V vs Li/Li+), pseudo-reference, lithium alloy, etc. Defaults to 0.0 V. Set to the known equilibrium potential of your counter electrode."
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.reference_electrode_ocp_V.anyOf]]
+type = "number"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.reference_electrode_ocp_V.anyOf]]
+type = "null"
+
+[wrapper.input_schema.properties.simulation_parameters.properties.reference_electrode_charge_transfer_coefficient]
+description = "Butler-Volmer charge transfer coefficient for the counter/reference electrode (dimensionless, 0 < alpha < 1). Only used in half-cell mode (working_electrode='positive'). Applies to any counter electrode material. Defaults to 0.5 (symmetric kinetics). Controls the asymmetry of the anodic and cathodic reaction rates."
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.reference_electrode_charge_transfer_coefficient.anyOf]]
+exclusiveMaximum = 1
+exclusiveMinimum = 0
+type = "number"
+
+[[wrapper.input_schema.properties.simulation_parameters.properties.reference_electrode_charge_transfer_coefficient.anyOf]]
+type = "null"
 
 [wrapper.input_schema.properties.fail_fast]
 type = "boolean"
@@ -79,14 +2231,13 @@ default = "full"
 enum = ["full", "kpis", "summary"]
 description = "full = every field; kpis = drop timeseries/experiments/BOM; summary = comparison scalars only."
 
-# ---------------------------------------------------------------------
-# Output schema.
-# ---------------------------------------------------------------------
 [wrapper.output_schema]
 "$schema" = "http://json-schema.org/draft-07/schema#"
 type = "object"
 title = "Cell design batch results"
 required = ["results", "summary"]
+
+[wrapper.output_schema.properties]
 
 [wrapper.output_schema.properties.results]
 type = "array"
@@ -95,6 +2246,8 @@ description = "One entry per input design, positionally aligned with designs[]."
 [wrapper.output_schema.properties.results.items]
 type = "object"
 required = ["index", "status"]
+
+[wrapper.output_schema.properties.results.items.properties]
 
 [wrapper.output_schema.properties.results.items.properties.index]
 type = "integer"
@@ -121,12 +2274,837 @@ type = ["string", "null"]
 type = "number"
 
 [wrapper.output_schema.properties.results.items.properties.kpis]
+additionalProperties = false
+description = "Cell performance KPIs for this design. Null when status is not 'ok'; a subset when result_detail trims the response."
 type = ["object", "null"]
-description = "Cell performance KPIs for this design; null when status != 'ok'."
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties]
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_theoretical_capacity_Ah]
+description = "Theoretical cell capacity [Ah]"
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_theoretical_energy_Wh]
+description = "Theoretical cell energy [Wh]"
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_n_p_ratio]
+description = "Cell N:P ratio"
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.stoichiometry_windows]
+additionalProperties = false
+description = "Electrode stoichiometry windows from equilibrium + coulombic loss"
+required = ["sto_ca0", "sto_ca100", "sto_an0", "sto_an100"]
+type = "object"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.stoichiometry_windows.properties]
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.stoichiometry_windows.properties.sto_ca0]
+description = "Cathode sto at 0% SOC"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.stoichiometry_windows.properties.sto_ca100]
+description = "Cathode sto at 100% SOC"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.stoichiometry_windows.properties.sto_an0]
+description = "Anode sto at 0% SOC"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.stoichiometry_windows.properties.sto_an100]
+description = "Anode sto at 100% SOC"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_mass_g]
+description = "Cell mass [g]"
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_volume_L]
+description = "Cell volume [L]"
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_theoretical_gravimetric_energy_density_Wh_kg]
+description = "Theoretical gravimetric energy density [Wh/kg]"
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_theoretical_volumetric_energy_density_Wh_L]
+description = "Theoretical volumetric energy density [Wh/L]"
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.positive_electrode_porosity]
+description = "Positive electrode porosity"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.negative_electrode_porosity]
+description = "Negative electrode porosity"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.positive_electrode_density_g_cm3]
+description = "Positive electrode density [g/cm³]"
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.negative_electrode_density_g_cm3]
+description = "Negative electrode density [g/cm³]"
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.positive_electrode_volume_fraction]
+description = "Positive electrode volume fraction in cell"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.negative_electrode_volume_fraction]
+description = "Negative electrode volume fraction in cell"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.electrolyte_mass_g]
+description = "Electrolyte mass [g]"
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.electrolyte_mass_fraction]
+description = "Electrolyte mass fraction"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.jelly_roll_mass_g]
+description = "Jelly roll mass [g]"
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.jelly_roll_mass_fraction]
+description = "Jelly roll mass fraction"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.casing_mass_g]
+description = "Casing mass [g]"
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.casing_mass_fraction]
+description = "Casing mass fraction"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials]
+description = "Bill of materials with mass breakdown by component"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf]]
+additionalProperties = false
+type = "object"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties]
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.active_materials]
+description = "Active materials in both electrodes"
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.active_materials.items]
+additionalProperties = false
+required = ["name", "electrode", "mass_g", "mass_fraction"]
+type = "object"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.active_materials.items.properties]
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.active_materials.items.properties.name]
+description = "Material name"
+type = "string"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.active_materials.items.properties.electrode]
+description = "Electrode type"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.active_materials.items.properties.electrode.anyOf]]
+type = "string"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.active_materials.items.properties.electrode.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.active_materials.items.properties.mass_g]
+description = "Mass [g]"
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.active_materials.items.properties.mass_fraction]
+description = "Mass fraction [0-1]"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.binders]
+description = "Binders in both electrodes"
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.binders.items]
+additionalProperties = false
+required = ["name", "electrode", "mass_g", "mass_fraction"]
+type = "object"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.binders.items.properties]
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.binders.items.properties.name]
+description = "Material name"
+type = "string"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.binders.items.properties.electrode]
+description = "Electrode type"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.binders.items.properties.electrode.anyOf]]
+type = "string"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.binders.items.properties.electrode.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.binders.items.properties.mass_g]
+description = "Mass [g]"
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.binders.items.properties.mass_fraction]
+description = "Mass fraction [0-1]"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.conductive_agents]
+description = "Conductive agents in both electrodes"
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.conductive_agents.items]
+additionalProperties = false
+required = ["name", "electrode", "mass_g", "mass_fraction"]
+type = "object"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.conductive_agents.items.properties]
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.conductive_agents.items.properties.name]
+description = "Material name"
+type = "string"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.conductive_agents.items.properties.electrode]
+description = "Electrode type"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.conductive_agents.items.properties.electrode.anyOf]]
+type = "string"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.conductive_agents.items.properties.electrode.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.conductive_agents.items.properties.mass_g]
+description = "Mass [g]"
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.conductive_agents.items.properties.mass_fraction]
+description = "Mass fraction [0-1]"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.separator]
+description = "Separator material"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.separator.anyOf]]
+additionalProperties = false
+required = ["name", "electrode", "mass_g", "mass_fraction"]
+type = "object"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.separator.anyOf.properties]
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.separator.anyOf.properties.name]
+description = "Material name"
+type = "string"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.separator.anyOf.properties.electrode]
+description = "Electrode type"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.separator.anyOf.properties.electrode.anyOf]]
+type = "string"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.separator.anyOf.properties.electrode.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.separator.anyOf.properties.mass_g]
+description = "Mass [g]"
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.separator.anyOf.properties.mass_fraction]
+description = "Mass fraction [0-1]"
+maximum = 1
+minimum = 0
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.separator.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.foils]
+description = "Current collector foils"
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.foils.items]
+additionalProperties = false
+required = ["name", "electrode", "mass_g", "mass_fraction"]
+type = "object"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.foils.items.properties]
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.foils.items.properties.name]
+description = "Material name"
+type = "string"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.foils.items.properties.electrode]
+description = "Electrode type"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.foils.items.properties.electrode.anyOf]]
+type = "string"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.foils.items.properties.electrode.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.foils.items.properties.mass_g]
+description = "Mass [g]"
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.foils.items.properties.mass_fraction]
+description = "Mass fraction [0-1]"
+maximum = 1
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.electrolyte]
+description = "Electrolyte material"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.electrolyte.anyOf]]
+additionalProperties = false
+required = ["name", "electrode", "mass_g", "mass_fraction"]
+type = "object"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.electrolyte.anyOf.properties]
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.electrolyte.anyOf.properties.name]
+description = "Material name"
+type = "string"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.electrolyte.anyOf.properties.electrode]
+description = "Electrode type"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.electrolyte.anyOf.properties.electrode.anyOf]]
+type = "string"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.electrolyte.anyOf.properties.electrode.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.electrolyte.anyOf.properties.mass_g]
+description = "Mass [g]"
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.electrolyte.anyOf.properties.mass_fraction]
+description = "Mass fraction [0-1]"
+maximum = 1
+minimum = 0
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.electrolyte.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.casing]
+description = "Casing material"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.casing.anyOf]]
+additionalProperties = false
+required = ["name", "electrode", "mass_g", "mass_fraction"]
+type = "object"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.casing.anyOf.properties]
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.casing.anyOf.properties.name]
+description = "Material name"
+type = "string"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.casing.anyOf.properties.electrode]
+description = "Electrode type"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.casing.anyOf.properties.electrode.anyOf]]
+type = "string"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.casing.anyOf.properties.electrode.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.casing.anyOf.properties.mass_g]
+description = "Mass [g]"
+minimum = 0
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.casing.anyOf.properties.mass_fraction]
+description = "Mass fraction [0-1]"
+maximum = 1
+minimum = 0
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf.properties.casing.anyOf]]
+type = "null"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.bill_of_materials.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_capacity_Ah]
+description = "Cell nominal capacity at specified C-rate [Ah]"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_capacity_Ah.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_capacity_Ah.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_energy_Wh]
+description = "Cell nominal energy [Wh]"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_energy_Wh.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_energy_Wh.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_gravimetric_energy_density_Wh_kg]
+description = "Cell nominal gravimetric energy density [Wh/kg]"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_gravimetric_energy_density_Wh_kg.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_gravimetric_energy_density_Wh_kg.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_volumetric_energy_density_Wh_L]
+description = "Cell nominal volumetric energy density [Wh/L]"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_volumetric_energy_density_Wh_L.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_volumetric_energy_density_Wh_L.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_max_discharge_power_300s_W]
+description = "Cell nominal max discharge power (300s) [W]"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_max_discharge_power_300s_W.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_max_discharge_power_300s_W.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_gravimetric_power_density_W_kg]
+description = "Cell nominal gravimetric power density [W/kg]"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_gravimetric_power_density_W_kg.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_gravimetric_power_density_W_kg.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_volumetric_power_density_W_L]
+description = "Cell nominal volumetric power density [W/L]"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_volumetric_power_density_W_L.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_nominal_volumetric_power_density_W_L.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_dcir_10s_mohm]
+description = "Cell DCIR (10s) [mΩ]"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_dcir_10s_mohm.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.cell_dcir_10s_mohm.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.ocv100_V]
+description = "Open-circuit voltage at 100% SOC [V]"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.ocv100_V.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.ocv100_V.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.ocv0_V]
+description = "Open-circuit voltage at 0% SOC [V]"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.ocv0_V.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.ocv0_V.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries]
+description = "C/3 discharge time-series data (subsampled)"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf]]
+required = ["time_s", "voltage_V", "current_A", "temperature_K", "capacity_Ah", "energy_Wh", "power_W", "anode_potential_V"]
+type = "object"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties]
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.time_s]
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.time_s.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.voltage_V]
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.voltage_V.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.current_A]
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.current_A.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.temperature_K]
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.temperature_K.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.capacity_Ah]
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.capacity_Ah.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.energy_Wh]
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.energy_Wh.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.power_W]
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.power_W.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.anode_potential_V]
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.anode_potential_V.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.cc_capacity_Ah]
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.cc_capacity_Ah.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.cc_capacity_Ah.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.total_capacity_Ah]
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.total_capacity_Ah.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf.properties.total_capacity_Ah.anyOf]]
+type = "null"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.c3_discharge_timeseries.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results]
+description = "Multi-cycle experiment results keyed by ExperimentConfig.label. Present only when experiments were requested."
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf]]
+type = "object"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties]
+additionalProperties = false
+description = "Full output of a completed PyBaMM experiment."
+required = ["timeseries", "n_cycles_completed"]
+type = "object"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties]
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries]
+required = ["time_s", "voltage_V", "current_A", "temperature_K", "capacity_Ah", "energy_Wh", "power_W", "anode_potential_V"]
+type = "object"
+description = "Concatenated timeseries from all cycles and steps (subsampled via RDP)."
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties]
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.time_s]
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.time_s.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.voltage_V]
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.voltage_V.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.current_A]
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.current_A.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.temperature_K]
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.temperature_K.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.capacity_Ah]
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.capacity_Ah.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.energy_Wh]
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.energy_Wh.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.power_W]
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.power_W.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.anode_potential_V]
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.anode_potential_V.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.cc_capacity_Ah]
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.cc_capacity_Ah.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.cc_capacity_Ah.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.total_capacity_Ah]
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.total_capacity_Ah.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.timeseries.properties.total_capacity_Ah.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries]
+description = "Per-cycle capacity and efficiency summaries."
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items]
+additionalProperties = false
+description = "Per-cycle summary extracted from a completed experiment."
+required = ["cycle_number"]
+type = "object"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties]
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.cycle_number]
+description = "1-indexed cycle number."
+type = "integer"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.discharge_capacity_Ah]
+description = "Total discharge throughput in this cycle [Ah]."
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.discharge_capacity_Ah.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.discharge_capacity_Ah.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.charge_capacity_Ah]
+description = "Total charge throughput in this cycle [Ah]."
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.charge_capacity_Ah.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.charge_capacity_Ah.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.coulombic_efficiency_pct]
+description = "Coulombic efficiency for this cycle [%]: 100 * discharge_capacity / charge_capacity."
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.coulombic_efficiency_pct.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.coulombic_efficiency_pct.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.total_capacity_throughput_Ah]
+description = "Total capacity throughput (sum of |Ah| across all steps) in this cycle [Ah]."
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.total_capacity_throughput_Ah.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.total_capacity_throughput_Ah.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.total_energy_throughput_Wh]
+description = "Total energy throughput (sum of |Wh| across all steps) in this cycle [Wh]."
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.total_energy_throughput_Wh.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.total_energy_throughput_Wh.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.min_voltage_V]
+description = "Minimum terminal voltage in this cycle [V]."
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.min_voltage_V.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.min_voltage_V.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.max_voltage_V]
+description = "Maximum terminal voltage in this cycle [V]."
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.max_voltage_V.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.max_voltage_V.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.max_temperature_K]
+description = "Maximum cell temperature in this cycle [K]."
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.max_temperature_K.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.cycle_summaries.items.properties.max_temperature_K.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.n_cycles_completed]
+description = "Number of full cycles that completed before any termination."
+type = "integer"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.total_capacity_throughput_Ah]
+description = "Total capacity throughput across all cycles and steps [Ah]."
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.total_capacity_throughput_Ah.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.total_capacity_throughput_Ah.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.total_energy_throughput_Wh]
+description = "Total energy throughput across all cycles and steps [Wh]."
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.total_energy_throughput_Wh.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.total_energy_throughput_Wh.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements]
+description = "EIS snapshots taken at each EIS step across all cycles, in execution order."
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items]
+additionalProperties = false
+description = "Result of a single EIS measurement."
+required = ["frequencies_hz", "z_real_ohm", "z_imag_ohm", "z_magnitude_ohm", "z_phase_deg", "cycle_number", "step_index"]
+type = "object"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items.properties]
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items.properties.frequencies_hz]
+description = "Frequency points [Hz]."
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items.properties.frequencies_hz.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items.properties.z_real_ohm]
+description = "Real part of impedance [Ω]."
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items.properties.z_real_ohm.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items.properties.z_imag_ohm]
+description = "Imaginary part of impedance [Ω]. Negative values indicate capacitive behaviour."
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items.properties.z_imag_ohm.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items.properties.z_magnitude_ohm]
+description = "|Z| magnitude [Ω]."
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items.properties.z_magnitude_ohm.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items.properties.z_phase_deg]
+description = "Phase angle [°]."
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items.properties.z_phase_deg.items]
+type = "number"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items.properties.cycle_number]
+description = "1-indexed cycle in which this was taken."
+type = "integer"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items.properties.step_index]
+description = "0-indexed position of this EIS step within the full step list."
+type = "integer"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items.properties.soc_pct]
+description = "Estimated SOC at measurement time [%]."
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items.properties.soc_pct.anyOf]]
+type = "number"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.eis_measurements.items.properties.soc_pct.anyOf]]
+type = "null"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.warnings]
+description = "Non-fatal warnings raised during experiment execution (e.g. missing optional dependencies that caused steps to be skipped)."
+type = "array"
+
+[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf.additionalProperties.properties.warnings.items]
+type = "string"
+
+[[wrapper.output_schema.properties.results.items.properties.kpis.properties.experiment_results.anyOf]]
+type = "null"
 
 [wrapper.output_schema.properties.summary]
 type = "object"
 description = "Batch-level counts plus a flat comparison table across designs."
+
+[wrapper.output_schema.properties.summary.properties]
 
 [wrapper.output_schema.properties.summary.properties.design_count]
 type = "integer"
@@ -152,3 +3130,70 @@ description = "Key scalar KPIs per design — chartable without unpacking result
 
 [wrapper.output_schema.properties.summary.properties.comparison.items]
 type = "object"
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties]
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.index]
+type = "integer"
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.id]
+type = ["string", "null"]
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.name]
+type = ["string", "null"]
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.status]
+type = "string"
+enum = ["ok", "error", "skipped"]
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.cell_nominal_capacity_Ah]
+type = ["number", "null"]
+description = "Cell nominal capacity at specified C-rate [Ah]"
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.cell_nominal_energy_Wh]
+type = ["number", "null"]
+description = "Cell nominal energy [Wh]"
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.cell_nominal_gravimetric_energy_density_Wh_kg]
+type = ["number", "null"]
+description = "Cell nominal gravimetric energy density [Wh/kg]"
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.cell_nominal_volumetric_energy_density_Wh_L]
+type = ["number", "null"]
+description = "Cell nominal volumetric energy density [Wh/L]"
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.cell_nominal_max_discharge_power_300s_W]
+type = ["number", "null"]
+description = "Cell nominal max discharge power (300s) [W]"
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.cell_dcir_10s_mohm]
+type = ["number", "null"]
+description = "Cell DCIR (10s) [mΩ]"
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.cell_theoretical_capacity_Ah]
+type = ["number", "null"]
+description = "Theoretical cell capacity [Ah]"
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.cell_theoretical_energy_Wh]
+type = ["number", "null"]
+description = "Theoretical cell energy [Wh]"
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.cell_mass_g]
+type = ["number", "null"]
+description = "Cell mass [g]"
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.cell_volume_L]
+type = ["number", "null"]
+description = "Cell volume [L]"
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.cell_n_p_ratio]
+type = ["number", "null"]
+description = "Cell N:P ratio"
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.ocv100_V]
+type = ["number", "null"]
+description = "Open-circuit voltage at 100% SOC [V]"
+
+[wrapper.output_schema.properties.summary.properties.comparison.items.properties.ocv0_V]
+type = ["number", "null"]
+description = "Open-circuit voltage at 0% SOC [V]"
