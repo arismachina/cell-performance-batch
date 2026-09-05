@@ -81,6 +81,106 @@ class TestProtosToml:
         assert declared["maximum"] == MAX_WORKERS_CAP
 
 
+class TestGeneratedStructs:
+    """The full model structs must actually be in the TOML, and current.
+
+    Protos reads the declared schemas verbatim, so a struct that drifts
+    from the vendored Pydantic models is a schema the platform trusts
+    and shouldn't.
+    """
+
+    def _design_props(self, spec) -> dict:
+        return spec["wrapper"]["input_schema"]["properties"]["designs"]["items"][
+            "properties"
+        ]
+
+    def test_protos_toml_is_not_stale(self):
+        sys.path.insert(0, str(REPO_ROOT / "scripts"))
+        from generate_protos_toml import render
+
+        assert PROTOS_TOML.read_text() == render(), (
+            "protos.toml is out of date — run " "python scripts/generate_protos_toml.py"
+        )
+
+    def test_cell_parameters_carries_every_model_field(self, spec):
+        from cell_performance_batch.cell_performance import CellParametersInput
+
+        declared = self._design_props(spec)["cell_parameters"]
+        assert set(declared["properties"]) == set(CellParametersInput.model_fields)
+        assert set(declared["required"]) == {
+            name
+            for name, field in CellParametersInput.model_fields.items()
+            if field.is_required()
+        }
+        # extra="forbid" upstream — the schema should say so, otherwise a
+        # typo'd field silently no-ops instead of failing at the edge.
+        assert declared["additionalProperties"] is False
+
+    def test_simulation_parameters_is_expanded_in_both_places(self, spec):
+        from cell_performance_batch.cell_performance import SimulationParameters
+
+        fields = set(SimulationParameters.model_fields)
+        per_design = self._design_props(spec)["simulation_parameters"]
+        batch_level = spec["wrapper"]["input_schema"]["properties"][
+            "simulation_parameters"
+        ]
+        assert set(per_design["properties"]) == fields
+        assert set(batch_level["properties"]) == fields
+
+    def test_nested_material_structs_are_expanded_too(self, spec):
+        from cell_performance_batch.cell_performance import ActiveMaterial
+
+        materials = self._design_props(spec)["cell_parameters"]["properties"][
+            "positive_electrode_active_materials"
+        ]
+        assert materials["type"] == "array"
+        assert set(materials["items"]["properties"]) == set(ActiveMaterial.model_fields)
+
+    def test_kpis_output_struct_is_expanded(self, spec):
+        from cell_performance_batch.cell_performance import CellPerformanceKPIs
+
+        kpis = spec["wrapper"]["output_schema"]["properties"]["results"]["items"][
+            "properties"
+        ]["kpis"]
+        assert set(kpis["properties"]) == set(CellPerformanceKPIs.model_fields)
+        # No `required`: under result_detail 'kpis'/'summary' those fields
+        # are genuinely absent, so requiring them would be a lie.
+        assert "required" not in kpis
+
+    def test_no_refs_survive_into_the_declaration(self, spec):
+        # Nothing in the platform's protos.toml path resolves $ref, so a
+        # surviving reference is an opaque hole in the schema.
+        rendered = json.dumps(spec)
+        assert "$ref" not in rendered
+        assert "$defs" not in rendered
+
+    def test_platform_dry_run_sample_still_validates(self, spec):
+        from cell_performance_batch.batch import BatchInput
+
+        # Mirrors protos-v2's containerization/sample_input.py: required
+        # fields plus the first couple of optional ones, defaults only.
+        schema = spec["wrapper"]["input_schema"]
+        required = set(schema.get("required", []))
+        sample: dict = {}
+        defaults = {
+            "number": 1.0,
+            "integer": 1,
+            "boolean": False,
+            "array": [],
+            "object": {},
+        }
+        for key, prop in schema["properties"].items():
+            if key not in required and len(sample) >= 2:
+                continue
+            ptype = prop.get("type", "string")
+            sample[key] = prop.get("default", defaults.get(ptype, "test"))
+
+        # The dry run must not need a solve — an empty batch is the whole
+        # point of the lazy PyBaMM import.
+        assert sample["designs"] == []
+        BatchInput.model_validate(sample)
+
+
 class TestWrapperContract:
     def _run(self, model_input: str | None) -> subprocess.CompletedProcess:
         env = {**os.environ, "PYTHONPATH": str(REPO_ROOT / "src")}
